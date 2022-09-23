@@ -1,0 +1,226 @@
+----------App.js--------
+import Navbar from "./Navbar"
+import Registration from "./pages/Registration"
+import Home from "./pages/Home"
+import Appointment from "./pages/Appointment"
+import { Route, Routes } from "react-router-dom"
+
+function App() {
+  return (
+    <>
+      <Navbar />
+      <div className="container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/registration" element={<Registration />} />
+          <Route path="/appointment" element={<Appointment />} />
+        </Routes>
+      </div>
+    </>
+  )
+}
+
+export default App
+
+----------index.js--------
+import React from "react"
+import ReactDOM from "react-dom/client"
+import App from "./App"
+import "./styles.css"
+import { BrowserRouter } from "react-router-dom"
+
+const root = ReactDOM.createRoot(document.getElementById("root"))
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+)
+
+----------Navbar.js--------
+import { Link, useMatch, useResolvedPath } from "react-router-dom"
+
+export default function Navbar() {
+  return (
+    <nav className="nav">
+      <Link to="/" className="site-title">
+        Medical Center
+      </Link>
+      <ul>
+        <CustomLink to="/registration">Registration</CustomLink>
+        <CustomLink to="/appointment">Appointment</CustomLink>
+      </ul>
+    </nav>
+  )
+}
+
+function CustomLink({ to, children, ...props }) {
+  const resolvedPath = useResolvedPath(to)
+  const isActive = useMatch({ path: resolvedPath.pathname, end: true })
+
+  return (
+    <li className={isActive ? "active" : ""}>
+      <Link to={to} {...props}>
+        {children}
+      </Link>
+    </li>
+  )
+}
+
+
+----------Appointment.js--------
+export default function Appointment() {
+    return (
+        <div className="form">
+            <h1>Appointment</h1>
+            <div className="form-body">
+                <div className="username">
+                    <label className="form__label" for="search">IIN </label>
+                    <input className="form__input" type="text" id="IIN"/>
+                    <br/>
+                    <button type="search" class="btn">Search</button>
+                </div>
+                
+                <div className="analysis">
+                    <p>Choose analysis: </p>
+                    <select name="analysis" id="analysis">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div class="footer">
+                    <button type="submit" class="btn">Submit</button>
+                </div>
+            </div>
+        </div>
+
+    )
+  }
+
+
+----------Home.js--------
+export default function Home() {
+    return (
+        <div className="form">
+            <h1>Find Client</h1>
+            <div className="form-body">
+                <div className="username">
+                    <label className="form__label" for="search">IIN </label>
+                    <input className="form__input" type="text" id="IIN"/>
+                    <br/>
+                    <button type="search" class="btn">Search</button>
+                </div>
+            </div>
+        </div>
+    )
+  }
+
+----------Registration.js--------
+import { useState } from 'react'
+//import { renderMatches } from 'react-router-dom'
+import './RegistrationStyles.css'
+
+export default function Registration() {
+    const [firstName, setfirstName] = useState("")
+    const [lastName, setlastName] = useState("")
+    const [iin, setiin] = useState("")
+    const [email, setemail] = useState("")
+    const [phone, setphone] = useState("")
+
+        async function InsertClient()
+        {
+            let item = {firstName, lastName, iin, email, phone}
+           // console.warn(item)
+            let result = await fetch("https://localhost:7176/api/Registration",{
+                method: "POST",
+                mode: 'no-cors',
+                headers:{
+                    "Accept":'application/json',
+                    "Content-Type":'application/json',
+                    "Charset": 'utf-8'
+                },
+                body:JSON.stringify(item)
+            })
+            result = await result.json()
+            console.warn("result" , result)
+
+
+
+        }
+
+        return (
+            <div className="form">
+                <h1>Client Data</h1>
+                <div className="form-body">
+                    <div className="username">
+                        <label>First Name </label>
+                        <input value={firstName} type="text" id="firstName" onChange={(e)=>setfirstName(e.target.value)}/>
+                    </div>
+                    <div className="lastname">
+                        <label>Last Name </label>
+                        <input  type="text" value={lastName} id="lastName"  onChange={(e)=>setlastName(e.target.value)}/>
+                    </div>
+                    <div className="iin">
+                        <label>IIN </label>
+                        <input  type="iin" value = {iin} id="iin" onChange={(e)=>setiin(e.target.value)}/>
+                    </div>
+                    <div className="email">
+                        <label>Email </label>
+                        <input  type="email" value={email} id="email" onChange={(e)=>setemail(e.target.value)}/>
+                    </div>
+                    <div className="phone">
+                        <label>Phone </label>
+                        <input value={phone} type="phone"  id="phone" onChange={(e)=>setphone(e.target.value)}/>
+                    </div>
+                    
+                </div>
+                <br/>
+                <div className="footer">
+                    <button type="submit" className="btn" onClick={InsertClient}>Submit</button>
+                </div>
+            </div>   
+        )   
+
+    
+  }
+
+----------Registration.css--------
+
+body{
+    background: #bdc3c7; 
+    background: -webkit-linear-gradient(to right, #2c3e50, #bdc3c7);
+    background: linear-gradient(to right, #2c3e50, #bdc3c7); 
+}
+
+.form{
+    background-color: white;
+    border-radius: 5px;
+    width: 300px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.form-body{
+    text-align: left;
+    width: 113px;
+}
+
+.form-body > *{
+    padding: 5px;
+}
+
+.form__label{
+    width: 40%;
+}
+
+.form_input{
+    width: 60%;
+    padding-left:10px;
+}
+
+.footer{
+    text-align: center;
+}
